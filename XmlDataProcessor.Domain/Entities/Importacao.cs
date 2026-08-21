@@ -12,6 +12,12 @@ public class Importacao
 
     public int TotalRegistros { get; private set; }
 
+    public int TotalSucessos { get; private set; }
+
+    public int TotalErros { get; private set; }
+
+    public int TotalDuplicados { get; private set; }
+
     public Importacao(
         string nomeArquivo,
         DateTime dataRecebimento)
@@ -46,25 +52,20 @@ public class Importacao
         Status = StatusImportacao.Processando;
     }
 
-    public void Concluir()
-    {
-        ValidarSeEstaProcessando();
+public void Concluir()
+{
+    ValidarSeEstaProcessando();
 
-        Status = StatusImportacao.Concluida;
-    }
+    Status = TotalErros > 0
+        ? StatusImportacao.ConcluidaComErros
+        : StatusImportacao.Concluida;
+}
 
     public void Falhar()
     {
         ValidarSeEstaProcessando();
 
         Status = StatusImportacao.Falhou;
-    }
-
-    public void ConcluirComErros()
-    {
-        ValidarSeEstaProcessando();
-
-        Status = StatusImportacao.ConcluidaComErros;
     }
 
     private void ValidarSeEstaProcessando()
@@ -76,9 +77,27 @@ public class Importacao
         }
     }
 
-    public void RegistrarRegistroProcessado()
+    public void RegistrarSucesso()
     {
         ValidarSeEstaProcessando();
+
         TotalRegistros++;
+        TotalSucessos++;
+    }
+
+    public void RegistrarErro()
+    {
+        ValidarSeEstaProcessando();
+
+        TotalRegistros++;
+        TotalErros++;
+    }
+
+    public void RegistrarDuplicado()
+    {
+        ValidarSeEstaProcessando();
+
+        TotalRegistros++;
+        TotalDuplicados++;
     }
 }
