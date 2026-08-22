@@ -4,6 +4,7 @@ namespace XmlDataProcessor.Domain.Entities;
 
 public class Importacao
 {
+    public long Id { get; private set; }
     public string NomeArquivo { get; private set; }
 
     public DateTime DataRecebimento { get; private set; }
