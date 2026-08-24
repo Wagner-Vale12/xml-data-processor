@@ -22,6 +22,11 @@ public class IniciarImportacaoServiceTests
         {
             return Task.FromResult<Importacao?>(null);
         }
+
+        public Task AtualizarAsync(Importacao importacao)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     [Fact]
