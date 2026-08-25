@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/ScriptsDB/">
+    <File Path="Script.sql" />
+  </Folder>
   <Project Path="XmlDataProcessor.Api/XmlDataProcessor.Api.csproj" />
   <Project Path="XmlDataProcessor.Application/XmlDataProcessor.Application.csproj" />
   <Project Path="XmlDataProcessor.Domain/XmlDataProcessor.Domain.csproj" />

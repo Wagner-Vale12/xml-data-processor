@@ -11,10 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\XmlDataProcessor.Application\XmlDataProcessor.Application.csproj" />
     <ProjectReference Include="..\XmlDataProcessor.Infrastructure\XmlDataProcessor.Infrastructure.csproj" />
   </ItemGroup>
