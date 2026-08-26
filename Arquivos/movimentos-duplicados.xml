@@ -1,0 +1,17 @@
+﻿<Movimentos>
+	<Movimento>
+		<IdExterno>MOV-REAL-001</IdExterno>
+		<Tipo>Entrada</Tipo>
+		<Valor>150.50</Valor>
+		<DataMovimento>2026-08-25</DataMovimento>
+		<Documento>DOC-001</Documento>
+	</Movimento>
+
+	<Movimento>
+		<IdExterno>MOV-REAL-003</IdExterno>
+		<Tipo>Entrada</Tipo>
+		<Valor>500.00</Valor>
+		<DataMovimento>2026-08-25</DataMovimento>
+		<Documento>DOC-003</Documento>
+	</Movimento>
+</Movimentos>

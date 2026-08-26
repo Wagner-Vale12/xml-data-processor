@@ -8,22 +8,51 @@ namespace XmlDataProcessor.Api.Controllers;
 [Route("api/[controller]")]
 public class ImportacoesController : ControllerBase
 {
-    private readonly IniciarImportacaoService _service;
+    private readonly IniciarImportacaoService _iniciarImportacaoService;
+    private readonly ProcessarImportacaoService _processarImportacaoService;
+
+    private readonly ObterImportacaoPorIdService _obterImportacaoPorIdService;
 
     public ImportacoesController(
-        IniciarImportacaoService service)
+     IniciarImportacaoService iniciarImportacaoService,
+     ProcessarImportacaoService processarImportacaoService,
+     ObterImportacaoPorIdService obterImportacaoPorIdService)
     {
-        _service = service;
+        _iniciarImportacaoService = iniciarImportacaoService;
+        _processarImportacaoService = processarImportacaoService;
+        _obterImportacaoPorIdService = obterImportacaoPorIdService;
     }
 
     [HttpPost]
     public async Task<IActionResult> Criar(
     [FromBody] CriarImportacaoRequest request)
     {
-        await _service.ExecutarAsync(
-            request.NomeArquivo,
-            request.DataRecebimento);
+        await _iniciarImportacaoService.ExecutarAsync(
+         request.NomeArquivo,
+         request.DataRecebimento);
 
         return Ok();
+    }
+
+    [HttpPost("{id:long}/processar")]
+    public async Task<IActionResult> Processar(long id)
+    {
+        await _processarImportacaoService.ExecutarAsync(id);
+
+        return Ok();
+    }
+
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> ObterPorId(long id)
+    {
+        var importacao =
+            await _obterImportacaoPorIdService.ExecutarAsync(id);
+
+        if (importacao is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(importacao);
     }
 }

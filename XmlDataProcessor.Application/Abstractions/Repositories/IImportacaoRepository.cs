@@ -9,4 +9,6 @@ public interface IImportacaoRepository
     Task<Importacao?> ObterPorIdAsync(long id);
 
     Task AtualizarAsync(Importacao importacao);
+
+    Task<IReadOnlyCollection<Importacao>> ListarAsync();
 }

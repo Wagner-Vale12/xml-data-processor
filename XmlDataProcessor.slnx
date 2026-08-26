@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Arquivos/">
+    <File Path="movimentos-2026-08-25.xml" />
+    <File Path="movimentos-duplicados.xml" />
+  </Folder>
   <Folder Name="/ScriptsDB/">
     <File Path="Script.sql" />
   </Folder>

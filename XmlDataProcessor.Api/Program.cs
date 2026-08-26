@@ -1,6 +1,8 @@
 using XmlDataProcessor.Infrastructure.Persistence.Connection;
 using XmlDataProcessor.Application.Abstractions.Repositories;
 using XmlDataProcessor.Infrastructure.Persistence.Repositories;
+using XmlDataProcessor.Application.Abstractions.Xml;
+using XmlDataProcessor.Infrastructure.Xml;
 using XmlDataProcessor.Application.UseCases.Importacoes;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,9 +22,21 @@ var connectionString = builder.Configuration
 builder.Services.AddSingleton<ISqlConnectionFactory>(
     new SqlConnectionFactory(connectionString));
 
+builder.Services.AddScoped<
+    ILeitorMovimentosXml,
+    LeitorMovimentosXml>();
+
 builder.Services.AddScoped<IImportacaoRepository, ImportacaoRepository>();
 
+builder.Services.AddScoped<
+    IMovimentoRepository,
+    MovimentoRepository>();
+
 builder.Services.AddScoped<IniciarImportacaoService>();
+
+builder.Services.AddScoped<ProcessarImportacaoService>();
+
+builder.Services.AddScoped<ObterImportacaoPorIdService>();
 
 var app = builder.Build();
 

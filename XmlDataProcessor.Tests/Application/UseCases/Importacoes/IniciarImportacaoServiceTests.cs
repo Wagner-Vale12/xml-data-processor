@@ -9,6 +9,13 @@ public class IniciarImportacaoServiceTests
 {
     private class ImportacaoRepositoryFake : IImportacaoRepository
     {
+        public Task<IReadOnlyCollection<Importacao>> ListarAsync()
+        {
+            IReadOnlyCollection<Importacao> importacoes =
+                Array.Empty<Importacao>();
+
+            return Task.FromResult(importacoes);
+        }
         public Importacao? ImportacaoAdicionada { get; private set; }
 
         public Task AdicionarAsync(Importacao importacao)

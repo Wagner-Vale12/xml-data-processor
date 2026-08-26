@@ -101,4 +101,45 @@ public void Concluir()
         TotalRegistros++;
         TotalDuplicados++;
     }
+
+    internal Importacao(
+    long id,
+    string nomeArquivo,
+    DateTime dataRecebimento,
+    StatusImportacao status,
+    int totalRegistros,
+    int totalSucessos,
+    int totalErros,
+    int totalDuplicados)
+    {
+        Id = id;
+        NomeArquivo = nomeArquivo;
+        DataRecebimento = dataRecebimento;
+        Status = status;
+        TotalRegistros = totalRegistros;
+        TotalSucessos = totalSucessos;
+        TotalErros = totalErros;
+        TotalDuplicados = totalDuplicados;
+    }
+
+    public static Importacao Restaurar(
+    long id,
+    string nomeArquivo,
+    DateTime dataRecebimento,
+    StatusImportacao status,
+    int totalRegistros,
+    int totalSucessos,
+    int totalErros,
+    int totalDuplicados)
+    {
+        return new Importacao(
+            id,
+            nomeArquivo,
+            dataRecebimento,
+            status,
+            totalRegistros,
+            totalSucessos,
+            totalErros,
+            totalDuplicados);
+    }
 }

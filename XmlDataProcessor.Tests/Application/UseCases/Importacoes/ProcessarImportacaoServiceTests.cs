@@ -29,6 +29,14 @@ public class ProcessarImportacaoServiceTests
             return Task.FromResult(ImportacaoRetornada);
         }
 
+        public Task<IReadOnlyCollection<Importacao>> ListarAsync()
+        {
+            IReadOnlyCollection<Importacao> importacoes =
+                Array.Empty<Importacao>();
+
+            return Task.FromResult(importacoes);
+        }
+
         public Task AtualizarAsync(Importacao importacao)
         {
             ImportacaoAtualizada = importacao;
