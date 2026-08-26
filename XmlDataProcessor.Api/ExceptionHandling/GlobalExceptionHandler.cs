@@ -34,6 +34,13 @@ public class GlobalExceptionHandler : IExceptionHandler
                 Detail = exception.Message
             },
 
+            FileNotFoundException => new ProblemDetails
+            {
+                Status = StatusCodes.Status404NotFound,
+                Title = "Arquivo não encontrado",
+                Detail = exception.Message
+            },
+
             InvalidOperationException => new ProblemDetails
             {
                 Status = StatusCodes.Status409Conflict,
@@ -59,4 +66,5 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         return true;
     }
+
 }

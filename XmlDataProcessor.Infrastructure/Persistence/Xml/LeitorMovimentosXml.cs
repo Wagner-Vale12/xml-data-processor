@@ -8,10 +8,45 @@ namespace XmlDataProcessor.Infrastructure.Xml;
 
 public class LeitorMovimentosXml : ILeitorMovimentosXml
 {
+    private readonly string _diretorioBase;
+
+    public LeitorMovimentosXml()
+        : this(Directory.GetCurrentDirectory())
+    {
+    }
+
+    public LeitorMovimentosXml(string diretorioBase)
+    {
+        if (string.IsNullOrWhiteSpace(diretorioBase))
+        {
+            throw new ArgumentException(
+                "O diretório base dos arquivos é obrigatório.",
+                nameof(diretorioBase));
+        }
+
+        _diretorioBase = diretorioBase;
+    }
+
     public async Task<IReadOnlyCollection<Movimento>> LerAsync(
         string nomeArquivo)
     {
-        var xml = await File.ReadAllTextAsync(nomeArquivo);
+        if (string.IsNullOrWhiteSpace(nomeArquivo))
+        {
+            throw new ArgumentException(
+                "O nome do arquivo é obrigatório.",
+                nameof(nomeArquivo));
+        }
+
+        var caminhoArquivo = ObterCaminhoArquivo(nomeArquivo);
+
+        if (!File.Exists(caminhoArquivo))
+        {
+            throw new FileNotFoundException(
+                $"O arquivo XML '{nomeArquivo}' não foi encontrado.",
+                caminhoArquivo);
+        }
+
+        var xml = await File.ReadAllTextAsync(caminhoArquivo);
 
         var documento = XDocument.Parse(xml);
 
@@ -23,12 +58,12 @@ public class LeitorMovimentosXml : ILeitorMovimentosXml
                     "IdExterno"),
 
                 ObterTipoMovimentoObrigatorio(
-    elemento,
-    "Tipo"),
+                    elemento,
+                    "Tipo"),
 
                 ObterDecimalObrigatorio(
-    elemento,
-    "Valor"),
+                    elemento,
+                    "Valor"),
 
                 ObterDataObrigatoria(
                     elemento,
@@ -38,6 +73,18 @@ public class LeitorMovimentosXml : ILeitorMovimentosXml
             .ToList();
 
         return movimentos;
+    }
+
+    private string ObterCaminhoArquivo(string nomeArquivo)
+    {
+        if (Path.IsPathRooted(nomeArquivo))
+        {
+            return nomeArquivo;
+        }
+
+        return Path.Combine(
+            _diretorioBase,
+            nomeArquivo);
     }
 
     private static string ObterValorObrigatorio(
@@ -58,8 +105,8 @@ public class LeitorMovimentosXml : ILeitorMovimentosXml
     }
 
     private static decimal ObterDecimalObrigatorio(
-    XElement elemento,
-    string nomeElemento)
+        XElement elemento,
+        string nomeElemento)
     {
         var valor = ObterValorObrigatorio(
             elemento,
@@ -79,8 +126,8 @@ public class LeitorMovimentosXml : ILeitorMovimentosXml
     }
 
     private static TipoMovimento ObterTipoMovimentoObrigatorio(
-    XElement elemento,
-    string nomeElemento)
+        XElement elemento,
+        string nomeElemento)
     {
         var valor = ObterValorObrigatorio(
             elemento,
@@ -99,8 +146,8 @@ public class LeitorMovimentosXml : ILeitorMovimentosXml
     }
 
     private static DateTime ObterDataObrigatoria(
-    XElement elemento,
-    string nomeElemento)
+        XElement elemento,
+        string nomeElemento)
     {
         var valor = ObterValorObrigatorio(
             elemento,
@@ -118,5 +165,4 @@ public class LeitorMovimentosXml : ILeitorMovimentosXml
 
         return resultado;
     }
-
 }

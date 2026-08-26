@@ -27,9 +27,14 @@ var connectionString = builder.Configuration
 builder.Services.AddSingleton<ISqlConnectionFactory>(
     new SqlConnectionFactory(connectionString));
 
-builder.Services.AddScoped<
-    ILeitorMovimentosXml,
-    LeitorMovimentosXml>();
+var diretorioArquivos = Path.GetFullPath(
+    Path.Combine(
+        builder.Environment.ContentRootPath,
+        "..",
+        "Arquivos"));
+
+builder.Services.AddScoped<ILeitorMovimentosXml>(
+    _ => new LeitorMovimentosXml(diretorioArquivos));
 
 builder.Services.AddScoped<IImportacaoRepository, ImportacaoRepository>();
 
@@ -45,6 +50,17 @@ builder.Services.AddScoped<ObterImportacaoPorIdService>();
 
 builder.Services.AddScoped<ListarImportacoesService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -56,6 +72,8 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
+app.UseCors("Frontend");
+    
 app.UseAuthorization();
 
 app.MapControllers();

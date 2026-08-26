@@ -1,0 +1,198 @@
+<section class="mx-auto max-w-[1400px] px-6 py-8">
+  <header class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Importações</h1>
+
+      <p class="mt-2 text-sm text-slate-500">Acompanhe o processamento dos arquivos XML.</p>
+    </div>
+
+    <div class="flex gap-3">
+      <button
+        type="button"
+        (click)="abrirFormulario()"
+        class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700"
+      >
+        Nova importação
+      </button>
+
+      <button
+        type="button"
+        (click)="carregarImportacoes()"
+        class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+      >
+        Atualizar
+      </button>
+    </div>
+  </header>
+
+  @if (exibindoFormulario()) {
+    <div class="mb-6">
+      <app-importacao-form
+        (importacaoCriada)="aoCriarImportacao()"
+        (cancelar)="fecharFormulario()"
+      />
+    </div>
+  }
+
+  @if (carregando()) {
+    <div class="rounded-lg border border-slate-200 bg-white p-6">
+      <p class="text-sm text-slate-500">Carregando importações...</p>
+    </div>
+  }
+
+  @if (erro()) {
+    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+      <p class="text-sm font-medium text-red-700">
+        {{ erro() }}
+      </p>
+    </div>
+  }
+
+  @if (!carregando() && !erro()) {
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="min-w-full">
+          <thead class="bg-slate-50">
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                ID
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Arquivo
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Data
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Status
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Registros
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Sucessos
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Erros
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Duplicados
+              </th>
+
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+              >
+                Ações
+              </th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-200">
+            @for (importacao of importacoes(); track importacao.id) {
+              <tr class="transition hover:bg-slate-50">
+                <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900">
+                  {{ importacao.id }}
+                </td>
+
+                <td
+                  class="max-w-[320px] px-4 py-4 text-sm text-slate-700"
+                  [title]="importacao.nomeArquivo"
+                >
+                  <div class="truncate">
+                    {{ importacao.nomeArquivo }}
+                  </div>
+                </td>
+
+                <td class="whitespace-nowrap px-4 py-4 text-sm text-slate-600">
+                  {{ importacao.dataRecebimento | date: 'dd/MM/yyyy HH:mm' }}
+                </td>
+
+                <td class="whitespace-nowrap px-4 py-4">
+                  <span
+                    class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+                    [class.bg-slate-100]="importacao.status === 0"
+                    [class.text-slate-700]="importacao.status === 0"
+                    [class.bg-blue-100]="importacao.status === 1"
+                    [class.text-blue-700]="importacao.status === 1"
+                    [class.bg-green-100]="importacao.status === 2"
+                    [class.text-green-700]="importacao.status === 2"
+                    [class.bg-amber-100]="importacao.status === 3"
+                    [class.text-amber-700]="importacao.status === 3"
+                    [class.bg-red-100]="importacao.status === 4"
+                    [class.text-red-700]="importacao.status === 4"
+                  >
+                    {{ statusTexto(importacao.status) }}
+                  </span>
+                </td>
+
+                <td class="px-4 py-4 text-sm text-slate-700">
+                  {{ importacao.totalRegistros }}
+                </td>
+
+                <td class="px-4 py-4 text-sm font-medium text-green-700">
+                  {{ importacao.totalSucessos }}
+                </td>
+
+                <td class="px-4 py-4 text-sm font-medium text-red-700">
+                  {{ importacao.totalErros }}
+                </td>
+
+                <td class="px-4 py-4 text-sm font-medium text-amber-700">
+                  {{ importacao.totalDuplicados }}
+                </td>
+
+                <td class="whitespace-nowrap px-4 py-4">
+                  @if (importacao.status === 0) {
+                    <button
+                      type="button"
+                      (click)="processar(importacao)"
+                      [disabled]="processandoId() === importacao.id"
+                      class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      @if (processandoId() === importacao.id) {
+                        Processando...
+                      } @else {
+                        Processar
+                      }
+                    </button>
+                  } @else {
+                    <span class="text-sm text-slate-400"> — </span>
+                  }
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="9" class="px-6 py-10 text-center text-sm text-slate-500">
+                  Nenhuma importação encontrada.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</section>
