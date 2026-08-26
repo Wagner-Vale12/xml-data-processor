@@ -4,11 +4,11 @@ namespace XmlDataProcessor.Application.Abstractions.Repositories;
 
 public interface IImportacaoRepository
 {
-    Task AdicionarAsync(Importacao importacao);
+    Task<long> AdicionarAsync(Importacao importacao);
 
     Task<Importacao?> ObterPorIdAsync(long id);
 
-    Task AtualizarAsync(Importacao importacao);
-
     Task<IReadOnlyCollection<Importacao>> ListarAsync();
+
+    Task AtualizarAsync(Importacao importacao);
 }

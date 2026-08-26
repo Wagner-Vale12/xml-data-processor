@@ -4,6 +4,7 @@ using XmlDataProcessor.Infrastructure.Persistence.Repositories;
 using XmlDataProcessor.Application.Abstractions.Xml;
 using XmlDataProcessor.Infrastructure.Xml;
 using XmlDataProcessor.Application.UseCases.Importacoes;
+using XmlDataProcessor.Api.ExceptionHandling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,10 @@ builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddProblemDetails();
 
 var connectionString = builder.Configuration
     .GetConnectionString("DefaultConnection")
@@ -38,6 +43,8 @@ builder.Services.AddScoped<ProcessarImportacaoService>();
 
 builder.Services.AddScoped<ObterImportacaoPorIdService>();
 
+builder.Services.AddScoped<ListarImportacoesService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,6 +52,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 

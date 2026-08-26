@@ -18,7 +18,7 @@ public class ImportacaoRepository : IImportacaoRepository
                 nameof(connectionFactory));
     }
 
-    public async Task AdicionarAsync(Importacao importacao)
+    public async Task<long> AdicionarAsync(Importacao importacao)
     {
         const string sql = """
         INSERT INTO Importacoes
@@ -31,6 +31,7 @@ public class ImportacaoRepository : IImportacaoRepository
             TotalErros,
             TotalDuplicados
         )
+        OUTPUT INSERTED.Id
         VALUES
         (
             @NomeArquivo,
@@ -46,7 +47,7 @@ public class ImportacaoRepository : IImportacaoRepository
         using var connection =
             _connectionFactory.CreateConnection();
 
-        await connection.ExecuteAsync(
+        return await connection.ExecuteScalarAsync<long>(
             sql,
             new
             {

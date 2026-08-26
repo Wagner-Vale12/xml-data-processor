@@ -17,9 +17,9 @@ public class ProcessarImportacaoServiceTests
 
         public Importacao? ImportacaoAtualizada { get; private set; }
 
-        public Task AdicionarAsync(Importacao importacao)
+        public Task<long> AdicionarAsync(Importacao importacao)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(1L);
         }
 
         public Task<Importacao?> ObterPorIdAsync(long id)

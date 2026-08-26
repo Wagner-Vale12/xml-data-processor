@@ -18,11 +18,13 @@ public class IniciarImportacaoServiceTests
         }
         public Importacao? ImportacaoAdicionada { get; private set; }
 
-        public Task AdicionarAsync(Importacao importacao)
+        public long IdGerado { get; set; } = 1;
+
+        public Task<long> AdicionarAsync(Importacao importacao)
         {
             ImportacaoAdicionada = importacao;
 
-            return Task.CompletedTask;
+            return Task.FromResult(IdGerado);
         }
 
         public Task<Importacao?> ObterPorIdAsync(long id)
@@ -122,4 +124,21 @@ public void DeveCriarImportacaoComIdZero()
 
     Assert.Equal(0, importacao.Id);
 }
+
+    [Fact]
+    public async Task DeveRetornarIdGeradoPeloRepository()
+    {
+        var repository = new ImportacaoRepositoryFake
+        {
+            IdGerado = 123
+        };
+
+        var service = new IniciarImportacaoService(repository);
+
+        var id = await service.ExecutarAsync(
+            "movimentos-2026-08-26.xml",
+            new DateTime(2026, 8, 26, 10, 0, 0));
+
+        Assert.Equal(123, id);
+    }
 }

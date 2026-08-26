@@ -12,14 +12,16 @@ public class IniciarImportacaoService
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    public async Task ExecutarAsync(
-        string nomeArquivo,
-        DateTime dataRecebimento)
+    public async Task<long> ExecutarAsync(
+     string nomeArquivo,
+     DateTime dataRecebimento)
     {
         var importacao = new Importacao(
             nomeArquivo,
             dataRecebimento);
 
-        await _repository.AdicionarAsync(importacao);
+        var id = await _repository.AdicionarAsync(importacao);
+
+        return id;
     }
 }
