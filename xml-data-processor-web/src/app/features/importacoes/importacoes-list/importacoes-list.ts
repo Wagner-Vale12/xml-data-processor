@@ -4,11 +4,12 @@ import { Component, inject, signal } from '@angular/core';
 import { ImportacoesService } from '../../../core/services/importacoes';
 import { Importacao } from '../../../models/importacao';
 import { ImportacaoForm } from '../importacao-form/importacao-form';
+import { ImportacaoDetalhes } from '../importacao-detalhes/importacao-detalhes';
 
 @Component({
   selector: 'app-importacoes-list',
   standalone: true,
-  imports: [CommonModule, ImportacaoForm],
+  imports: [CommonModule, ImportacaoForm, ImportacaoDetalhes],
   templateUrl: './importacoes-list.html',
   styleUrl: './importacoes-list.css',
 })
@@ -18,6 +19,56 @@ export class ImportacoesList {
   readonly importacoes = signal<Importacao[]>([]);
   readonly carregando = signal(true);
   readonly erro = signal<string | null>(null);
+  readonly processandoId = signal<number | null>(null);
+  readonly sucesso = signal<string | null>(null);
+  readonly exibindoFormulario = signal(false);
+  readonly importacaoSelecionada = signal<Importacao | null>(null);
+  readonly termoBusca = signal('');
+  readonly statusFiltro = signal<number | null>(null);
+
+  verDetalhes(importacao: Importacao): void {
+    this.erro.set(null);
+
+    this.importacoesService.obterPorId(importacao.id).subscribe({
+      next: (detalhes) => {
+        this.importacaoSelecionada.set(detalhes);
+      },
+
+      error: (erro) => {
+        console.error('Erro ao buscar detalhes da importação:', erro);
+
+        const mensagem =
+          erro?.error?.detail ?? 'Não foi possível carregar os detalhes da importação.';
+
+        this.erro.set(mensagem);
+      },
+    });
+  }
+
+  fecharDetalhes(): void {
+    this.importacaoSelecionada.set(null);
+  }
+
+  importacoesFiltradas(): Importacao[] {
+    const termo = this.termoBusca().trim().toLowerCase();
+
+    const status = this.statusFiltro();
+
+    return this.importacoes().filter((importacao) => {
+      const correspondeAoTermo =
+        !termo ||
+        importacao.nomeArquivo.toLowerCase().includes(termo) ||
+        importacao.id.toString().includes(termo);
+
+      const correspondeAoStatus = status === null || importacao.status === status;
+
+      return correspondeAoTermo && correspondeAoStatus;
+    });
+  }
+
+  quantidadeFiltrada(): number {
+    return this.importacoesFiltradas().length;
+  }
 
   constructor() {
     this.carregarImportacoes();
@@ -64,27 +115,32 @@ export class ImportacoesList {
     }
   }
 
-  readonly processandoId = signal<number | null>(null);
-
   processar(importacao: Importacao): void {
     this.processandoId.set(importacao.id);
 
     this.importacoesService.processar(importacao.id).subscribe({
       next: () => {
         this.processandoId.set(null);
+
+        this.sucesso.set(`Importação #${importacao.id} processada com sucesso.`);
+
         this.carregarImportacoes();
+
+        setTimeout(() => {
+          this.sucesso.set(null);
+        }, 4000);
       },
       error: (erro) => {
         console.error('Erro ao processar importação:', erro);
 
-        this.erro.set('Não foi possível processar a importação.');
+        const mensagem = erro?.error?.detail ?? 'Não foi possível processar a importação.';
+
+        this.erro.set(mensagem);
 
         this.processandoId.set(null);
       },
     });
   }
-
-  readonly exibindoFormulario = signal(false);
 
   abrirFormulario(): void {
     this.exibindoFormulario.set(true);
@@ -96,6 +152,31 @@ export class ImportacoesList {
 
   aoCriarImportacao(): void {
     this.exibindoFormulario.set(false);
+
+    this.sucesso.set('Importação criada com sucesso.');
+
     this.carregarImportacoes();
+
+    setTimeout(() => {
+      this.sucesso.set(null);
+    }, 4000);
+  }
+
+  totalImportacoes(): number {
+    return this.importacoes().length;
+  }
+
+  totalRecebidas(): number {
+    return this.importacoes().filter((importacao) => importacao.status === 0).length;
+  }
+
+  totalConcluidas(): number {
+    return this.importacoes().filter((importacao) => importacao.status === 2).length;
+  }
+
+  totalComProblema(): number {
+    return this.importacoes().filter(
+      (importacao) => importacao.status === 3 || importacao.status === 4,
+    ).length;
   }
 }

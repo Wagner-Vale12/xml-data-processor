@@ -25,18 +25,114 @@
     </div>
   </header>
 
-  @if (exibindoFormulario()) {
-    <div class="mb-6">
-      <app-importacao-form
-        (importacaoCriada)="aoCriarImportacao()"
-        (cancelar)="fecharFormulario()"
+  <div class="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p class="text-sm font-medium text-slate-500">Total de importações</p>
+
+      <p class="mt-2 text-3xl font-bold text-slate-900">
+        {{ totalImportacoes() }}
+      </p>
+    </article>
+
+    <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <p class="text-sm font-medium text-slate-500">Recebidas</p>
+
+      <p class="mt-2 text-3xl font-bold text-slate-700">
+        {{ totalRecebidas() }}
+      </p>
+    </article>
+
+    <article class="rounded-xl border border-green-200 bg-green-50 p-5 shadow-sm">
+      <p class="text-sm font-medium text-green-700">Concluídas</p>
+
+      <p class="mt-2 text-3xl font-bold text-green-800">
+        {{ totalConcluidas() }}
+      </p>
+    </article>
+
+    <article class="rounded-xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+      <p class="text-sm font-medium text-amber-700">Com erro / falha</p>
+
+      <p class="mt-2 text-3xl font-bold text-amber-800">
+        {{ totalComProblema() }}
+      </p>
+    </article>
+  </div>
+
+  <div
+    class="mb-4 flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-end"
+  >
+    <div class="flex-1">
+      <label for="busca" class="mb-2 block text-sm font-semibold text-slate-700"> Buscar </label>
+
+      <input
+        id="busca"
+        type="text"
+        placeholder="Buscar por ID ou nome do arquivo"
+        [value]="termoBusca()"
+        (input)="termoBusca.set($any($event.target).value)"
+        class="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
       />
     </div>
-  }
 
-  @if (carregando()) {
-    <div class="rounded-lg border border-slate-200 bg-white p-6">
-      <p class="text-sm text-slate-500">Carregando importações...</p>
+    <div class="w-full md:w-64">
+      <label for="status" class="mb-2 block text-sm font-semibold text-slate-700"> Status </label>
+
+      <select
+        id="status"
+        [value]="statusFiltro() ?? ''"
+        (change)="
+          statusFiltro.set($any($event.target).value === '' ? null : +$any($event.target).value)
+        "
+        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
+      >
+        <option value="">Todos</option>
+        <option value="0">Recebida</option>
+        <option value="1">Processando</option>
+        <option value="2">Concluída</option>
+        <option value="3">Concluída com erros</option>
+        <option value="4">Falhou</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="mb-4 flex items-center justify-between">
+    <p class="text-sm text-slate-500">
+      Exibindo
+      <span class="font-semibold text-slate-700">
+        {{ quantidadeFiltrada() }}
+      </span>
+      de
+      <span class="font-semibold text-slate-700">
+        {{ totalImportacoes() }}
+      </span>
+      importações
+    </p>
+
+    @if (termoBusca() || statusFiltro() !== null) {
+      <button
+        type="button"
+        (click)="termoBusca.set(''); statusFiltro.set(null)"
+        class="text-sm font-semibold text-slate-600 transition hover:text-slate-900"
+      >
+        Limpar filtros
+      </button>
+    }
+  </div>
+
+  @if (sucesso()) {
+    <div
+      class="mb-6 flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3"
+    >
+      <span
+        class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 text-sm font-bold text-green-700"
+      >
+        ✓
+      </span>
+
+      <p class="text-sm font-medium text-green-700">
+        {{ sucesso() }}
+      </p>
     </div>
   }
 
@@ -48,10 +144,31 @@
     </div>
   }
 
+  @if (exibindoFormulario()) {
+    <div class="mb-6">
+      <app-importacao-form
+        (importacaoCriada)="aoCriarImportacao()"
+        (cancelar)="fecharFormulario()"
+      />
+    </div>
+  }
+
+  @if (importacaoSelecionada(); as importacao) {
+    <div class="mb-6">
+      <app-importacao-detalhes [importacao]="importacao" (fechar)="fecharDetalhes()" />
+    </div>
+  }
+
+  @if (carregando()) {
+    <div class="rounded-lg border border-slate-200 bg-white p-6">
+      <p class="text-sm text-slate-500">Carregando importações...</p>
+    </div>
+  }
+
   @if (!carregando() && !erro()) {
     <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <div class="overflow-x-auto">
-        <table class="min-w-full">
+      <div class="overflow-x-auto overscroll-x-contain">
+        <table class="min-w-[1100px] w-full">
           <thead class="bg-slate-50">
             <tr>
               <th
@@ -103,7 +220,7 @@
               </th>
 
               <th
-                class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+                class="sticky right-0 z-10 bg-slate-50 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
               >
                 Ações
               </th>
@@ -111,7 +228,7 @@
           </thead>
 
           <tbody class="divide-y divide-slate-200">
-            @for (importacao of importacoes(); track importacao.id) {
+            @for (importacao of importacoesFiltradas(); track importacao.id) {
               <tr class="transition hover:bg-slate-50">
                 <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-slate-900">
                   {{ importacao.id }}
@@ -164,23 +281,31 @@
                   {{ importacao.totalDuplicados }}
                 </td>
 
-                <td class="whitespace-nowrap px-4 py-4">
-                  @if (importacao.status === 0) {
+                <td class="sticky right-0 bg-white whitespace-nowrap px-4 py-4">
+                  <div class="flex items-center gap-2">
                     <button
                       type="button"
-                      (click)="processar(importacao)"
-                      [disabled]="processandoId() === importacao.id"
-                      class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      (click)="verDetalhes(importacao)"
+                      class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
                     >
-                      @if (processandoId() === importacao.id) {
-                        Processando...
-                      } @else {
-                        Processar
-                      }
+                      Detalhes
                     </button>
-                  } @else {
-                    <span class="text-sm text-slate-400"> — </span>
-                  }
+
+                    @if (importacao.status === 0) {
+                      <button
+                        type="button"
+                        (click)="processar(importacao)"
+                        [disabled]="processandoId() === importacao.id"
+                        class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        @if (processandoId() === importacao.id) {
+                          Processando...
+                        } @else {
+                          Processar
+                        }
+                      </button>
+                    }
+                  </div>
                 </td>
               </tr>
             } @empty {

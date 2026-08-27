@@ -1,0 +1,93 @@
+<div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+  <header class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        Detalhes da importação
+      </p>
+
+      <h2 class="mt-1 text-2xl font-bold text-slate-900">Importação #{{ importacao().id }}</h2>
+    </div>
+
+    <button
+      type="button"
+      (click)="fechar.emit()"
+      class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+    >
+      Fechar
+    </button>
+  </header>
+
+  <div class="grid gap-5 md:grid-cols-3">
+    <div>
+      <p class="text-xs font-semibold uppercase text-slate-400">Arquivo</p>
+
+      <p class="mt-1 break-all text-sm font-medium text-slate-800">
+        {{ importacao().nomeArquivo }}
+      </p>
+    </div>
+
+    <div>
+      <p class="text-xs font-semibold uppercase text-slate-400">Recebimento</p>
+
+      <p class="mt-1 text-sm font-medium text-slate-800">
+        {{ importacao().dataRecebimento | date: 'dd/MM/yyyy HH:mm' }}
+      </p>
+    </div>
+
+    <div>
+      <p class="text-xs font-semibold uppercase text-slate-400">Status</p>
+
+      <div class="mt-1">
+        <span
+          class="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+          [class.bg-slate-100]="importacao().status === 0"
+          [class.text-slate-700]="importacao().status === 0"
+          [class.bg-blue-100]="importacao().status === 1"
+          [class.text-blue-700]="importacao().status === 1"
+          [class.bg-green-100]="importacao().status === 2"
+          [class.text-green-700]="importacao().status === 2"
+          [class.bg-amber-100]="importacao().status === 3"
+          [class.text-amber-700]="importacao().status === 3"
+          [class.bg-red-100]="importacao().status === 4"
+          [class.text-red-700]="importacao().status === 4"
+        >
+          {{ statusTexto(importacao().status) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-lg bg-slate-50 p-4">
+      <p class="text-sm font-medium text-slate-500">Registros</p>
+
+      <p class="mt-1 text-2xl font-bold text-slate-900">
+        {{ importacao().totalRegistros }}
+      </p>
+    </div>
+
+    <div class="rounded-lg bg-green-50 p-4">
+      <p class="text-sm font-medium text-green-700">Sucessos</p>
+
+      <p class="mt-1 text-2xl font-bold text-green-800">
+        {{ importacao().totalSucessos }}
+      </p>
+    </div>
+
+    <div class="rounded-lg bg-red-50 p-4">
+      <p class="text-sm font-medium text-red-700">Erros</p>
+
+      <p class="mt-1 text-2xl font-bold text-red-800">
+        {{ importacao().totalErros }}
+      </p>
+    </div>
+
+    <div class="rounded-lg bg-amber-50 p-4">
+      <p class="text-sm font-medium text-amber-700">Duplicados</p>
+
+      <p class="mt-1 text-2xl font-bold text-amber-800">
+        {{ importacao().totalDuplicados }}
+      </p>
+    </div>
+  </div>
+</div>

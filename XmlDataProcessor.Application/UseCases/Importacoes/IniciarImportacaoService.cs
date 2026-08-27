@@ -16,6 +16,14 @@ public class IniciarImportacaoService
      string nomeArquivo,
      DateTime dataRecebimento)
     {
+        if (!nomeArquivo.EndsWith(
+    ".xml",
+    StringComparison.OrdinalIgnoreCase))
+        {
+            throw new ArgumentException(
+                "O arquivo informado deve possuir extensão .xml.",
+                nameof(nomeArquivo));
+        }
         var importacao = new Importacao(
             nomeArquivo,
             dataRecebimento);

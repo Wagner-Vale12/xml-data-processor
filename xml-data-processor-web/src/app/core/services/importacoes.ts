@@ -17,11 +17,15 @@ export class ImportacoesService {
     return this.http.get<Importacao[]>(this.apiUrl);
   }
 
-  processar(id: number): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/${id}/processar`, {});
+  obterPorId(id: number): Observable<Importacao> {
+    return this.http.get<Importacao>(`${this.apiUrl}/${id}`);
   }
 
   criar(request: CriarImportacaoRequest): Observable<{ id: number }> {
     return this.http.post<{ id: number }>(this.apiUrl, request);
+  }
+
+  processar(id: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${id}/processar`, {});
   }
 }

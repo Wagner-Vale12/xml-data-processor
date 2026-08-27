@@ -27,8 +27,15 @@
         class="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-200"
       />
 
-      @if (form.controls.nomeArquivo.touched && form.controls.nomeArquivo.invalid) {
+      @if (form.controls.nomeArquivo.touched && form.controls.nomeArquivo.hasError('required')) {
         <p class="mt-2 text-sm text-red-600">O arquivo é obrigatório.</p>
+      }
+
+      @if (
+        form.controls.nomeArquivo.touched &&
+        form.controls.nomeArquivo.hasError('arquivoXmlInvalido')
+      ) {
+        <p class="mt-2 text-sm text-red-600">Informe um arquivo com extensão .xml.</p>
       }
     </div>
 

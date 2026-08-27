@@ -1,8 +1,29 @@
 import { Component, inject, output, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 
 import { ImportacoesService } from '../../../core/services/importacoes';
 import { CriarImportacaoRequest } from '../../../models/criar-importacao-request';
+
+function arquivoXmlValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const valor = String(control.value ?? '')
+      .trim()
+      .toLowerCase();
+
+    if (!valor) {
+      return null;
+    }
+
+    return valor.endsWith('.xml') ? null : { arquivoXmlInvalido: true };
+  };
+}
 
 @Component({
   selector: 'app-importacao-form',
@@ -22,7 +43,8 @@ export class ImportacaoForm {
   readonly erro = signal<string | null>(null);
 
   readonly form = this.formBuilder.nonNullable.group({
-    nomeArquivo: ['', Validators.required],
+    nomeArquivo: ['', [Validators.required, arquivoXmlValidator()]],
+
     dataRecebimento: ['', Validators.required],
   });
 
@@ -36,7 +58,7 @@ export class ImportacaoForm {
     this.erro.set(null);
 
     const request: CriarImportacaoRequest = {
-      nomeArquivo: this.form.controls.nomeArquivo.value,
+      nomeArquivo: this.form.controls.nomeArquivo.value.trim(),
       dataRecebimento: this.form.controls.dataRecebimento.value,
     };
 
@@ -50,7 +72,9 @@ export class ImportacaoForm {
       error: (erro) => {
         console.error('Erro ao criar importação:', erro);
 
-        this.erro.set('Não foi possível criar a importação.');
+        const mensagem = erro?.error?.detail ?? 'Não foi possível criar a importação.';
+
+        this.erro.set(mensagem);
 
         this.salvando.set(false);
       },

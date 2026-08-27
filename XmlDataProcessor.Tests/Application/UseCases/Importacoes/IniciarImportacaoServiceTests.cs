@@ -141,4 +141,17 @@ public void DeveCriarImportacaoComIdZero()
 
         Assert.Equal(123, id);
     }
+
+    [Fact]
+    public async Task NaoDeveCriarImportacaoQuandoArquivoNaoForXml()
+    {
+        var repository = new ImportacaoRepositoryFake();
+
+        var service = new IniciarImportacaoService(repository);
+
+        await Assert.ThrowsAsync<ArgumentException>(
+            () => service.ExecutarAsync(
+                "arquivo.txt",
+                new DateTime(2026, 8, 26, 10, 0, 0)));
+    }
 }
